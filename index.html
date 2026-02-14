@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Shivjayanti 2026 - Score Control Panel</title>
+
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
+
+<style>
+body{
+margin:0;
+font-family:'Poppins',sans-serif;
+background:#0d0d0d;
+color:white;
+padding:30px;
+}
+
+h1{
+text-align:center;
+color:gold;
+margin-bottom:30px;
+}
+
+.team{
+background:#1a1a1a;
+border:2px solid gold;
+padding:15px;
+border-radius:15px;
+margin-bottom:15px;
+display:flex;
+justify-content:space-between;
+align-items:center;
+}
+
+.team-name{
+font-size:18px;
+}
+
+.points{
+font-size:22px;
+color:#00ffcc;
+font-weight:bold;
+}
+
+.buttons button{
+padding:8px 14px;
+margin-left:8px;
+border:none;
+border-radius:8px;
+cursor:pointer;
+font-weight:bold;
+}
+
+.plus{background:#008000;color:white;}
+.minus{background:#b30000;color:white;}
+</style>
+</head>
+
+<body>
+
+<h1>🔥 Shivjayanti 2026 Score Control Panel 🔥</h1>
+
+<div id="teams"></div>
+
+<script>
+
+/* 🔥 FIREBASE CONFIG */
+const firebaseConfig = {
+    apiKey: "AIzaSyBT9ON2wC-Clvfle4sLBzN_JSG2Og_B5-E",
+    authDomain: "shivjayanti-quiz.firebaseapp.com",
+    projectId: "shivjayanti-quiz",
+    storageBucket: "shivjayanti-quiz.firebasestorage.app",
+    messagingSenderId: "1038697528085",
+    appId: "1:1038697528085:web:546edadee7e1ffd4cd071c",
+    measurementId: "G-4KDV2RHM93"
+};
+
+firebase.initializeApp(firebaseConfig);
+const db = firebase.firestore();
+
+/* 🔥 LIVE TEAM DISPLAY */
+db.collection("teams").onSnapshot(snapshot=>{
+let html="";
+snapshot.forEach(doc=>{
+let data = doc.data();
+
+html += `
+<div class="team">
+<div>
+<div class="team-name">${data.name}</div>
+<div class="points">Points: ${data.points}</div>
+</div>
+
+<div class="buttons">
+<button class="plus" onclick="updateScore('${doc.id}',5)">+5</button>
+<button class="minus" onclick="updateScore('${doc.id}',-5)">-5</button>
+</div>
+</div>
+`;
+});
+
+document.getElementById("teams").innerHTML = html;
+});
+
+/* 🔥 UPDATE FUNCTION */
+function updateScore(id,value){
+let ref = db.collection("teams").doc(id);
+
+db.runTransaction(async (transaction)=>{
+let doc = await transaction.get(ref);
+let newPoints = doc.data().points + value;
+transaction.update(ref,{points:newPoints});
+});
+}
+
+</script>
+
+</body>
+</html>
